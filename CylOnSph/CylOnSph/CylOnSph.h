@@ -8,6 +8,7 @@
 #include <osg/Texture2D>
 #include <osgGA/GUIEventHandler>
 #include <osg/MatrixTransform>
+#include <opencv2/core/core.hpp>
 
 
 class TextureUpdateCallback : public osg::NodeCallback

@@ -77,8 +77,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(OSG_INCLUDE_PATH);$(IncludePath)</IncludePath>
-    <LibraryPath>$(OSG_LIB_PATH);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(OSG_INCLUDE_PATH);$(OCV_INCLUDE_PATH);$(IncludePath)</IncludePath>
+    <LibraryPath>$(OSG_LIB_PATH);$(OCV_LIB_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

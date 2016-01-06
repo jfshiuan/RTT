@@ -143,6 +143,67 @@ osg::MatrixTransform * transform2;
 		return textureCamera;
 	}
 
+	
+	osg::ref_ptr<osg::Geometry> buildSphere(const double radius, const unsigned int rings, const unsigned int sectors)
+	{
+	
+		osg::ref_ptr<osg::Geometry>   texturedSphereGeometry = new osg::Geometry;
+		osg::ref_ptr<osg::Vec3Array>  texturedSphereVertices = new osg::Vec3Array;
+		osg::ref_ptr<osg::Vec2Array>  texturedSphereTexCoords = new osg::Vec2Array;
+
+
+
+
+		float const R = 1.0 / static_cast<float>(rings - 1);
+		float const S = 1.0 / static_cast<float>(sectors - 1);
+
+
+		// Establish texture coordinates, vertex list
+		for (unsigned int r = 0; r < rings; ++r)
+		{
+			for (unsigned int s = 0; s < sectors; ++s)
+			{
+				float const z = sin(-CV_PI / 2.0 + CV_PI * r * R);
+				float const x = cos(2 * CV_PI * s * S) * sin(CV_PI * r * R);
+				float const y = sin(2 * CV_PI * s * S) * sin(CV_PI * r * R);
+
+				texturedSphereTexCoords->push_back(osg::Vec2(s * S, r * R));
+				texturedSphereVertices->push_back(osg::Vec3(x * radius, y * radius, z * radius));
+			}
+		}
+
+		texturedSphereGeometry->setVertexArray(texturedSphereVertices);
+		texturedSphereGeometry->setTexCoordArray(0, texturedSphereTexCoords);
+
+
+		// Generate quads for each face.
+		for (unsigned int r = 0; r < rings - 1; ++r)
+		{
+			for (unsigned int s = 0; s < sectors - 1; ++s)
+			{
+
+				float const x = cos(2 * CV_PI * s * S) * sin(CV_PI * r * R);
+				osg::ref_ptr<osg::DrawElementsUInt> face = new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 4);
+
+
+					// Corners of quads should be in CCW order.
+					face->push_back((r + 0) * sectors + (s + 0));
+					face->push_back((r + 0) * sectors + (s + 1));
+					face->push_back((r + 1) * sectors + (s + 1));
+					face->push_back((r + 1) * sectors + (s + 0));
+
+					texturedSphereGeometry->addPrimitiveSet(face);
+
+
+
+			}
+		}
+
+
+		return texturedSphereGeometry;
+	}
+	
+
 	osg::ref_ptr<osg::Geode> createScreenGeode(float width, float height, osg::ref_ptr<osg::Texture2D> renderTexture)
 	{
 		/*
@@ -158,14 +219,14 @@ osg::MatrixTransform * transform2;
 
 		osg::StateSet *renderToState = renderToGeode->getOrCreateStateSet();
 		renderToState->setTextureAttributeAndModes(0, renderTexture, osg::StateAttribute::ON);
-		renderToState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);*/
+		renderToState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-
+		return renderToGeode;*/
 
 
 
 		//SphereGeode
-		osg::ref_ptr<osg::Geode> sphereGeode = new osg::Geode;
+		/*osg::ref_ptr<osg::Geode> sphereGeode = new osg::Geode;
 		osg::TessellationHints* hints2 = new osg::TessellationHints;
 		osg::Sphere* sph2 = new osg::Sphere(osg::Vec3(width / 4.0f, width / 4.0f, 0.0f), width / 4.0f);
 		osg::ShapeDrawable* sphere2 = new osg::ShapeDrawable(sph2, hints2);
@@ -174,7 +235,26 @@ osg::MatrixTransform * transform2;
 		sphereState->setTextureAttributeAndModes(0, renderTexture, osg::StateAttribute::ON);
 		sphereState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-		return sphereGeode;
+		return sphereGeode;*/
+
+
+
+		
+		osg::ref_ptr<osg::Geometry> renderToGeometry = buildSphere(width/4.0, 30, 30);
+		
+		osg::ref_ptr<osg::Geode> renderToGeode = new osg::Geode;
+
+
+
+		renderToGeode->addDrawable(renderToGeometry.get());
+
+		osg::StateSet *renderToState = renderToGeode->getOrCreateStateSet();
+		renderToState->setTextureAttributeAndModes(0, renderTexture, osg::StateAttribute::ON);
+		renderToState->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+		return renderToGeode;
+
+
 	}
 
 	osg::ref_ptr<osg::Camera> createOrthoCamera(float width, float height, osg::ref_ptr<osg::Geode> screenGeode)
